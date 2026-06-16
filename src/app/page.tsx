@@ -1,65 +1,117 @@
-import Image from "next/image";
+'use client'
+
+import React, { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { Leaf, ArrowRight, Sparkles, Compass, Shield, Flame } from 'lucide-react'
+import { loginDemoUser } from '@/server/actions/auth'
 
 export default function Home() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleDemoLogin = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await loginDemoUser()
+      if (res.success) {
+        router.push('/dashboard')
+        router.refresh()
+      } else {
+        setError(res.error || 'Failed to authenticate as demo user.')
+      }
+    } catch (e) {
+      setError('An unexpected error occurred.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-background text-foreground overflow-hidden px-4 md:px-8 py-16">
+      {/* Background Radial Glow */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none z-0" />
+      
+      <div className="relative max-w-4xl w-full text-center space-y-12 z-10">
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/15 text-xs font-medium tracking-wide">
+          <Sparkles size={12} className="animate-pulse-slow" />
+          <span>Track Smarter. Live Greener.</span>
+        </div>
+
+        {/* Hero Title */}
+        <div className="space-y-6">
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white max-w-3xl mx-auto leading-[1.15]">
+            Observe, Project & Minimize Your{' '}
+            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 bg-clip-text text-transparent text-glow-emerald">
+              Carbon Footprint
+            </span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed">
+            CarbonSphere AI connects real-time data logs, stateful impact simulations, and personalized AI sustainability coaching to guide you toward a zero-emission life.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {/* Call to Actions */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+          <button
+            onClick={handleDemoLogin}
+            disabled={loading}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 active:scale-95 cursor-pointer disabled:opacity-50 disabled:scale-100 transition-all duration-200"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            {loading ? 'Entering Sphere...' : 'Login as Demo User'}
+            <ArrowRight size={18} />
+          </button>
+          
+          <Link
+            href="/login"
+            className="w-full sm:w-auto flex items-center justify-center px-8 py-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-medium border border-border transition-colors duration-200"
           >
-            Documentation
-          </a>
+            Email Login
+          </Link>
         </div>
-      </main>
+
+        {error && (
+          <p className="text-sm text-destructive font-medium border border-destructive/20 bg-destructive/10 px-4 py-2.5 rounded-lg max-w-xs mx-auto animate-shake">
+            {error}
+          </p>
+        )}
+
+        {/* Feature Highlights Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12 text-left">
+          <div className="glass-card glass-card-hover p-6 rounded-2xl space-y-4">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400">
+              <Compass size={20} />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Interactive Carbon Engine</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Log utilities, food habits, and travel profiles. Generate automatic greenhouse gas equivalency cards in seconds.
+            </p>
+          </div>
+
+          <div className="glass-card glass-card-hover p-6 rounded-2xl space-y-4">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400">
+              <Sparkles size={20} />
+            </div>
+            <h3 className="text-lg font-semibold text-white">AI Sustainability Coach</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Conversational streaming suggestions backed by Google Gemini. Instantly compiles custom carbon reduction steps.
+            </p>
+          </div>
+
+          <div className="glass-card glass-card-hover p-6 rounded-2xl space-y-4">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400">
+              <Shield size={20} />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Stateful Impact Simulator</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Run custom "what-if" models. Visualize projected savings and commit actions directly to your dashboard timeline.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+  )
 }
