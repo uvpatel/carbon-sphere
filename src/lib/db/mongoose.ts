@@ -38,8 +38,8 @@ export async function connectDB() {
     cached!.conn = await cached!.promise
   } catch (e) {
     cached!.promise = null
-    console.error('MongoDB Connection Error:', e)
-    throw e
+    console.warn('MongoDB connection failed. Falling back to local JSON database.', e)
+    return null
   }
 
   return cached!.conn

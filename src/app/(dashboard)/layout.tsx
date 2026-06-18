@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/Sidebar'
 import { getCurrentUser } from '@/server/actions/auth'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardLayout({
   children,
 }: {

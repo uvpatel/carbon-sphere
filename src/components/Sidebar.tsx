@@ -12,7 +12,9 @@ import {
   LogOut, 
   ChevronLeft, 
   ChevronRight,
-  Leaf
+  Leaf,
+  BookOpen,
+  Settings
 } from 'lucide-react'
 import { logoutUser } from '@/server/actions/auth'
 
@@ -33,6 +35,8 @@ export function Sidebar({ user }: SidebarProps) {
     { name: 'Calculator', href: '/calculator', icon: Calculator },
     { name: 'AI Coach', href: '/coach', icon: MessageSquare },
     { name: 'Impact Simulator', href: '/simulator', icon: TrendingUp },
+    { name: 'My Plan', href: '/plan', icon: BookOpen },
+    { name: 'Settings', href: '/settings', icon: Settings },
   ]
 
   const handleLogout = async () => {

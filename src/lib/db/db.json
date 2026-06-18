@@ -1,9 +1,9 @@
 {
   "User": [
     {
-      "_id": "5b2b49cf0e4df3058a35770b",
-      "createdAt": "2026-06-16T11:51:09.137Z",
-      "updatedAt": "2026-06-16T11:51:09.137Z",
+      "_id": "e81a534d09336779c8eee17e",
+      "createdAt": "2026-06-18T16:33:53.703Z",
+      "updatedAt": "2026-06-18T16:33:53.703Z",
       "email": "demo@carbonsphere.ai",
       "name": "Eco Champion",
       "status": "ACTIVE",
@@ -21,9 +21,9 @@
   ],
   "AchievementDefinition": [
     {
-      "_id": "66416a850e333755eaa540df",
-      "createdAt": "2026-06-16T11:51:09.136Z",
-      "updatedAt": "2026-06-16T11:51:09.136Z",
+      "_id": "ce02fab1481902468bc3fdc7",
+      "createdAt": "2026-06-18T16:33:53.703Z",
+      "updatedAt": "2026-06-18T16:33:53.703Z",
       "badgeCode": "FIRST_FOOTPRINT",
       "name": "Carbon Pioneer",
       "description": "Calculated your first carbon footprint.",
@@ -35,9 +35,9 @@
       }
     },
     {
-      "_id": "1228140f97fa3da38fef2f54",
-      "createdAt": "2026-06-16T11:51:09.136Z",
-      "updatedAt": "2026-06-16T11:51:09.136Z",
+      "_id": "27a54cc478eee5ccedd9a0a2",
+      "createdAt": "2026-06-18T16:33:53.703Z",
+      "updatedAt": "2026-06-18T16:33:53.703Z",
       "badgeCode": "STREAK_7",
       "name": "Green Guardian",
       "description": "Maintained a 7-day green activity streak.",
@@ -49,9 +49,9 @@
       }
     },
     {
-      "_id": "ca528dd25f95bbdc6e58e6bf",
-      "createdAt": "2026-06-16T11:51:09.136Z",
-      "updatedAt": "2026-06-16T11:51:09.136Z",
+      "_id": "8e1cc4a2f0390daff160e66c",
+      "createdAt": "2026-06-18T16:33:53.703Z",
+      "updatedAt": "2026-06-18T16:33:53.703Z",
       "badgeCode": "PLAN_ADOPTED",
       "name": "Green Strategist",
       "description": "Created your first personalized reduction plan.",
@@ -63,9 +63,9 @@
       }
     },
     {
-      "_id": "e377f9ee4f0536aa184f0f48",
-      "createdAt": "2026-06-16T11:51:09.136Z",
-      "updatedAt": "2026-06-16T11:51:09.136Z",
+      "_id": "0953ed474d9106ed5f4481d4",
+      "createdAt": "2026-06-18T16:33:53.703Z",
+      "updatedAt": "2026-06-18T16:33:53.703Z",
       "badgeCode": "DIET_SHIFT",
       "name": "Plant-Based Hero",
       "description": "Reduced diet emissions by switching to low-impact meals.",
@@ -77,9 +77,9 @@
       }
     },
     {
-      "_id": "94761da4df240c053b3a121f",
-      "createdAt": "2026-06-16T11:51:09.136Z",
-      "updatedAt": "2026-06-16T11:51:09.136Z",
+      "_id": "5e203e8ee66967e440d0273f",
+      "createdAt": "2026-06-18T16:33:53.703Z",
+      "updatedAt": "2026-06-18T16:33:53.703Z",
       "badgeCode": "GOAL_ACHIEVED",
       "name": "Carbon Crusher",
       "description": "Successfully reached your target footprint reduction.",
@@ -219,6 +219,134 @@
         "compostEnabled": true,
         "emissions": 300
       }
+    },
+    {
+      "_id": "ff56dabd78791c86d8422a5e",
+      "createdAt": "2026-05-19T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.704Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "totalCo2e": 8650,
+      "transportation": {
+        "carType": "petrol",
+        "kmPerWeek": 300,
+        "flightsPerYear": 3,
+        "emissions": 4200
+      },
+      "energy": {
+        "electricityKwh": 450,
+        "heatingSource": "gas",
+        "emissions": 2500
+      },
+      "diet": {
+        "type": "meat-heavy",
+        "mealFrequency": "high",
+        "emissions": 1200
+      },
+      "shopping": {
+        "monthlySpend": 500,
+        "emissions": 500
+      },
+      "waste": {
+        "recycleEnabled": false,
+        "compostEnabled": false,
+        "emissions": 250
+      }
+    },
+    {
+      "_id": "9bba86162184156abd832227",
+      "createdAt": "2026-05-29T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.704Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "totalCo2e": 7400,
+      "transportation": {
+        "carType": "petrol",
+        "kmPerWeek": 200,
+        "flightsPerYear": 2,
+        "emissions": 3200
+      },
+      "energy": {
+        "electricityKwh": 400,
+        "heatingSource": "gas",
+        "emissions": 2200
+      },
+      "diet": {
+        "type": "meat-medium",
+        "mealFrequency": "medium",
+        "emissions": 1000
+      },
+      "shopping": {
+        "monthlySpend": 550,
+        "emissions": 750
+      },
+      "waste": {
+        "recycleEnabled": true,
+        "compostEnabled": false,
+        "emissions": 250
+      }
+    },
+    {
+      "_id": "522632bc8228daccd21af202",
+      "createdAt": "2026-06-08T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.704Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "totalCo2e": 6100,
+      "transportation": {
+        "carType": "hybrid",
+        "kmPerWeek": 150,
+        "flightsPerYear": 1,
+        "emissions": 2100
+      },
+      "energy": {
+        "electricityKwh": 350,
+        "heatingSource": "gas",
+        "emissions": 1950
+      },
+      "diet": {
+        "type": "vegetarian",
+        "mealFrequency": "medium",
+        "emissions": 800
+      },
+      "shopping": {
+        "monthlySpend": 400,
+        "emissions": 1000
+      },
+      "waste": {
+        "recycleEnabled": true,
+        "compostEnabled": true,
+        "emissions": 250
+      }
+    },
+    {
+      "_id": "296ca6d659af952078529446",
+      "createdAt": "2026-06-16T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.704Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "totalCo2e": 4850,
+      "transportation": {
+        "carType": "electric",
+        "kmPerWeek": 100,
+        "flightsPerYear": 0,
+        "emissions": 1100
+      },
+      "energy": {
+        "electricityKwh": 300,
+        "heatingSource": "electric",
+        "emissions": 1500
+      },
+      "diet": {
+        "type": "vegan",
+        "mealFrequency": "high",
+        "emissions": 750
+      },
+      "shopping": {
+        "monthlySpend": 300,
+        "emissions": 1200
+      },
+      "waste": {
+        "recycleEnabled": true,
+        "compostEnabled": true,
+        "emissions": 300
+      }
     }
   ],
   "SimulationRun": [
@@ -246,6 +374,31 @@
         "solar_panels",
         "electric_car"
       ]
+    },
+    {
+      "_id": "da115f4e2b50e32f0c2715ac",
+      "createdAt": "2026-06-13T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "baselineCo2e": 4850,
+      "projectedCo2e": 3600,
+      "scenariosToggled": [
+        "vegan_diet",
+        "led_transition"
+      ]
+    },
+    {
+      "_id": "893bdb0ea71aad91a7b9e88f",
+      "createdAt": "2026-06-17T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "baselineCo2e": 4850,
+      "projectedCo2e": 2800,
+      "scenariosToggled": [
+        "vegan_diet",
+        "solar_panels",
+        "electric_car"
+      ]
     }
   ],
   "CarbonGoal": [
@@ -257,6 +410,16 @@
       "baselineCo2e": 8650,
       "targetCo2e": 4000,
       "deadline": "2026-12-13T11:51:09.138Z",
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "90530ccd375bf51bca040543",
+      "createdAt": "2026-06-18T16:33:53.705Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "baselineCo2e": 8650,
+      "targetCo2e": 4000,
+      "deadline": "2026-12-15T16:33:53.704Z",
       "status": "ACTIVE"
     }
   ],
@@ -318,6 +481,64 @@
           "status": "PENDING"
         }
       ]
+    },
+    {
+      "_id": "17c689e8aeda9aa5a4b6f9f1",
+      "createdAt": "2026-06-18T16:33:53.705Z",
+      "updatedAt": "2026-06-18T16:42:42.218Z",
+      "goalId": "90530ccd375bf51bca040543",
+      "userId": "e81a534d09336779c8eee17e",
+      "title": "Home & Travel Transition Plan",
+      "status": "ACTIVE",
+      "actions": [
+        {
+          "title": "Switch to LED Light Bulbs",
+          "description": "Replace traditional incandescent light bulbs with energy-efficient LED models.",
+          "category": "Energy",
+          "difficulty": "Easy",
+          "estimatedSavings": 150,
+          "weekToStart": 1,
+          "status": "PENDING",
+          "completedAt": null
+        },
+        {
+          "title": "Implement Meatless Mondays",
+          "description": "Substitute animal protein with plant-based alternatives at least one day per week.",
+          "category": "Diet",
+          "difficulty": "Easy",
+          "estimatedSavings": 200,
+          "weekToStart": 2,
+          "status": "COMPLETED",
+          "completedAt": "2026-06-10T16:33:53.704Z"
+        },
+        {
+          "title": "Commute by E-Bike or Transit",
+          "description": "Shift short drives (under 10km) to electric cycling or public transportation.",
+          "category": "Transportation",
+          "difficulty": "Medium",
+          "estimatedSavings": 800,
+          "weekToStart": 3,
+          "status": "PENDING"
+        },
+        {
+          "title": "Install Smart Thermostat",
+          "description": "Automate heating and cooling schedules to reduce gas consumption during away hours.",
+          "category": "Energy",
+          "difficulty": "Medium",
+          "estimatedSavings": 450,
+          "weekToStart": 4,
+          "status": "PENDING"
+        },
+        {
+          "title": "Install Rooftop Solar Panels",
+          "description": "Transition primary power supply to zero-emission grid offset solar generation.",
+          "category": "Energy",
+          "difficulty": "Hard",
+          "estimatedSavings": 2500,
+          "weekToStart": 8,
+          "status": "PENDING"
+        }
+      ]
     }
   ],
   "UserAchievement": [
@@ -336,6 +557,22 @@
       "userId": "5b2b49cf0e4df3058a35770b",
       "achievementId": "ca528dd25f95bbdc6e58e6bf",
       "unlockedAt": "2026-06-01T11:51:09.138Z"
+    },
+    {
+      "_id": "74b70e0025728cedb01cba40",
+      "createdAt": "2026-06-18T16:33:53.705Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "achievementId": "ce02fab1481902468bc3fdc7",
+      "unlockedAt": "2026-05-19T16:33:53.704Z"
+    },
+    {
+      "_id": "3315c960e4b9d05d5f691b54",
+      "createdAt": "2026-06-18T16:33:53.705Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "achievementId": "8e1cc4a2f0390daff160e66c",
+      "unlockedAt": "2026-06-03T16:33:53.704Z"
     }
   ],
   "ActivityLog": [
@@ -433,6 +670,125 @@
       "metadata": {
         "actionTitle": "Switch to LED Light Bulbs"
       }
+    },
+    {
+      "_id": "ca5fe032365da4858e327a43",
+      "createdAt": "2026-06-18T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "eventType": "LOGIN",
+      "metadata": {
+        "source": "web",
+        "autoLogin": true
+      }
+    },
+    {
+      "_id": "32d8d3744247012bd8c76f75",
+      "createdAt": "2026-06-17T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "eventType": "LOGIN",
+      "metadata": {
+        "source": "web",
+        "autoLogin": true
+      }
+    },
+    {
+      "_id": "5006ea501e514f1e663b0b36",
+      "createdAt": "2026-06-16T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "eventType": "LOGIN",
+      "metadata": {
+        "source": "web",
+        "autoLogin": true
+      }
+    },
+    {
+      "_id": "d6370e1703a9cc85f73cecc7",
+      "createdAt": "2026-06-15T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "eventType": "LOGIN",
+      "metadata": {
+        "source": "web",
+        "autoLogin": true
+      }
+    },
+    {
+      "_id": "b1d749224ea40d7e28b171fb",
+      "createdAt": "2026-06-14T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "eventType": "LOGIN",
+      "metadata": {
+        "source": "web",
+        "autoLogin": true
+      }
+    },
+    {
+      "_id": "9854ccd7646c7a5334a9bc6d",
+      "createdAt": "2026-06-13T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "eventType": "LOGIN",
+      "metadata": {
+        "source": "web",
+        "autoLogin": true
+      }
+    },
+    {
+      "_id": "19c6c4509bdbe7d989cfdc47",
+      "createdAt": "2026-06-12T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "eventType": "LOGIN",
+      "metadata": {
+        "source": "web",
+        "autoLogin": true
+      }
+    },
+    {
+      "_id": "5a1531ecf36e89be7f3ad1be",
+      "createdAt": "2026-06-16T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "eventType": "CALCULATE",
+      "metadata": {
+        "footprintId": "296ca6d659af952078529446"
+      }
+    },
+    {
+      "_id": "ab126c4b57a8c59fc8d792f7",
+      "createdAt": "2026-06-03T16:33:53.704Z",
+      "updatedAt": "2026-06-18T16:33:53.705Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "eventType": "ACTION_COMPLETED",
+      "metadata": {
+        "actionTitle": "Switch to LED Light Bulbs"
+      }
+    },
+    {
+      "_id": "d0a9a094e29054ad7b9774e1",
+      "createdAt": "2026-06-18T16:41:11.613Z",
+      "updatedAt": "2026-06-18T16:41:11.613Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "eventType": "ACTION_SKIPPED",
+      "metadata": {
+        "actionTitle": "Switch to LED Light Bulbs",
+        "planId": "17c689e8aeda9aa5a4b6f9f1"
+      }
+    },
+    {
+      "_id": "3d3d492250df1722a2c9135b",
+      "createdAt": "2026-06-18T16:42:42.219Z",
+      "updatedAt": "2026-06-18T16:42:42.219Z",
+      "userId": "e81a534d09336779c8eee17e",
+      "eventType": "ACTION_RESET",
+      "metadata": {
+        "actionTitle": "Switch to LED Light Bulbs",
+        "planId": "17c689e8aeda9aa5a4b6f9f1"
+      }
     }
   ],
   "AiConversation": [
@@ -441,6 +797,31 @@
       "createdAt": "2026-06-16T11:51:09.139Z",
       "updatedAt": "2026-06-16T11:51:09.139Z",
       "userId": "5b2b49cf0e4df3058a35770b",
+      "title": "Reducing Diet Footprint",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hi, I want to reduce my carbon footprint. What is the single biggest change I can make in my diet?"
+        },
+        {
+          "role": "model",
+          "content": "Hello! The single most impactful change you can make to your dietary carbon footprint is reducing your consumption of red meats (beef and lamb). Beef production emits roughly 60kg of greenhouse gases per kg of meat, which is nearly 10 times higher than poultry and over 30 times higher than peas or lentils. Transitioning to a plant-forward or vegetarian diet can drop your dietary emissions by up to 50%!"
+        },
+        {
+          "role": "user",
+          "content": "That makes sense. What about dairy products?"
+        },
+        {
+          "role": "model",
+          "content": "Cheese and butter also have high footprint profiles because they are highly concentrated dairy products requiring significant milk inputs. Swapping dairy milk for oat or almond milk, and scaling back on cheese, is another fast way to reduce emissions without completely going vegan."
+        }
+      ]
+    },
+    {
+      "_id": "2330d1f9dc8e81c9b811a420",
+      "createdAt": "2026-06-18T16:33:53.706Z",
+      "updatedAt": "2026-06-18T16:33:53.706Z",
+      "userId": "e81a534d09336779c8eee17e",
       "title": "Reducing Diet Footprint",
       "messages": [
         {
