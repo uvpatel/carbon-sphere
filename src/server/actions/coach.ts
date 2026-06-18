@@ -1,7 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
-import { AiConversation, User } from '@/lib/db/models'
+import { AiConversation } from '@/lib/db/models'
 import { connectDB } from '@/lib/db/mongoose'
 
 export async function getConversations() {
@@ -34,9 +34,10 @@ export async function createConversation(title: string = 'New Conversation') {
     await conversation.save()
 
     return { success: true, conversation: JSON.parse(JSON.stringify(conversation)) }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating conversation:', error)
-    return { success: false, error: error.message }
+    const err = error as Error
+    return { success: false, error: err.message }
   }
 }
 

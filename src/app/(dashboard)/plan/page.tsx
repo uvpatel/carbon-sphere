@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { Plus, ClipboardList, Sparkles } from 'lucide-react'
+import { ClipboardList, Sparkles } from 'lucide-react'
 import { getActivePlan } from '@/server/actions/plan'
 import { PlanList } from '@/components/PlanList'
 

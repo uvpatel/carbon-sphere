@@ -1,73 +1,95 @@
 'use server'
 
-import { cookies } from 'next/headers'
+import { headers } from 'next/headers'
 import { User, CarbonGoal } from '@/lib/db/models'
 import { connectDB } from '@/lib/db/mongoose'
+
+// Dynamically load server auth to prevent client bundle graphing of mongodb/node dependencies
+async function getServerAuth() {
+  const { auth } = await import('@/lib/auth')
+  return auth
+}
 
 export async function loginDemoUser() {
   try {
     await connectDB()
-    const demoUser = await User.findOne({ email: 'demo@carbonsphere.ai' })
-    if (!demoUser) {
-      return { success: false, error: 'Demo user not seeded. Please run the seeding script first.' }
-    }
-    
-    const cookieStore = await cookies()
-    cookieStore.set('carbonsphere-session', demoUser._id.toString(), {
-      path: '/',
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      sameSite: 'lax'
+    const auth = await getServerAuth()
+
+    // Sign in using Better Auth API
+    await auth.api.signInEmail({
+      body: {
+        email: 'demo@carbonsphere.ai',
+        password: 'demo-password-123',
+      },
+      headers: await headers(),
     })
     return { success: true }
-  } catch (error: any) {
-    console.error('Error logging in demo user:', error)
-    return { success: false, error: error.message || 'Authentication failed' }
+  } catch (error: unknown) {
+    // If the demo user does not exist in Better Auth database yet (e.g. memory database was reset),
+    // let's auto-register them!
+    try {
+      const auth = await getServerAuth()
+      await auth.api.signUpEmail({
+        body: {
+          email: 'demo@carbonsphere.ai',
+          password: 'demo-password-123',
+          name: 'Eco Champion',
+        },
+        headers: await headers(),
+      })
+
+      // Also ensure Mongoose User profile and baseline goal are seeded
+      let user = await User.findOne({ email: 'demo@carbonsphere.ai' })
+      if (!user) {
+        user = new User({
+          email: 'demo@carbonsphere.ai',
+          name: 'Eco Champion',
+          status: 'ACTIVE'
+        })
+        await user.save()
+      }
+
+      const existingGoal = await CarbonGoal.findOne({ userId: user._id })
+      if (!existingGoal) {
+        const goal = new CarbonGoal({
+          userId: user._id,
+          baselineCo2e: 8000,
+          targetCo2e: 4500,
+          deadline: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
+          status: 'ACTIVE'
+        })
+        await goal.save()
+      }
+
+      return { success: true }
+    } catch (signupError: unknown) {
+      console.error('Error logging in / registering demo user:', error, signupError)
+      const err = signupError as Error
+      return { success: false, error: err.message || 'Authentication failed' }
+    }
   }
 }
 
-export async function loginUser(email: string) {
+export async function loginUser(email: string, password?: string) {
   try {
     await connectDB()
-    let user = await User.findOne({ email: email.toLowerCase() })
-    
-    // Auto-register if not exists for user convenience in prototype
-    if (!user) {
-      user = new User({
+    const auth = await getServerAuth()
+    await auth.api.signInEmail({
+      body: {
         email: email.toLowerCase(),
-        name: email.split('@')[0],
-        status: 'ACTIVE'
-      })
-      await user.save()
-
-      // Set default goal
-      const goal = new CarbonGoal({
-        userId: user._id,
-        baselineCo2e: 8000,
-        targetCo2e: 4500,
-        deadline: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
-        status: 'ACTIVE'
-      })
-      await goal.save()
-    }
-
-    const cookieStore = await cookies()
-    cookieStore.set('carbonsphere-session', user._id.toString(), {
-      path: '/',
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7,
-      sameSite: 'lax'
+        password: password || 'demo-password-123',
+      },
+      headers: await headers(),
     })
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error logging in user:', error)
-    return { success: false, error: error.message || 'Authentication failed' }
+    const err = error as Error
+    return { success: false, error: err.message || 'Authentication failed' }
   }
 }
 
-export async function registerUser(name: string, email: string) {
+export async function registerUser(name: string, email: string, password?: string) {
   try {
     await connectDB()
     const existingUser = await User.findOne({ email: email.toLowerCase() })
@@ -75,14 +97,29 @@ export async function registerUser(name: string, email: string) {
       return { success: false, error: 'User already exists with this email' }
     }
 
-    const user = new User({
-      email: email.toLowerCase(),
-      name,
-      status: 'ACTIVE'
+    const auth = await getServerAuth()
+    // Sign up using Better Auth
+    await auth.api.signUpEmail({
+      body: {
+        email: email.toLowerCase(),
+        password: password || 'demo-password-123',
+        name,
+      },
+      headers: await headers(),
     })
-    await user.save()
 
-    // Set default goal
+    // Sync profile to Mongoose User collection
+    let user = await User.findOne({ email: email.toLowerCase() })
+    if (!user) {
+      user = new User({
+        email: email.toLowerCase(),
+        name,
+        status: 'ACTIVE'
+      })
+      await user.save()
+    }
+
+    // Set default baseline goal
     const goal = new CarbonGoal({
       userId: user._id,
       baselineCo2e: 8000,
@@ -92,27 +129,22 @@ export async function registerUser(name: string, email: string) {
     })
     await goal.save()
 
-    const cookieStore = await cookies()
-    cookieStore.set('carbonsphere-session', user._id.toString(), {
-      path: '/',
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7,
-      sameSite: 'lax'
-    })
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error registering user:', error)
-    return { success: false, error: error.message || 'Registration failed' }
+    const err = error as Error
+    return { success: false, error: err.message || 'Registration failed' }
   }
 }
 
 export async function logoutUser() {
   try {
-    const cookieStore = await cookies()
-    cookieStore.delete('carbonsphere-session')
+    const auth = await getServerAuth()
+    await auth.api.signOut({
+      headers: await headers(),
+    })
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error logging out:', error)
     return { success: false, error: 'Logout failed' }
   }
@@ -121,11 +153,14 @@ export async function logoutUser() {
 export async function getCurrentUser() {
   try {
     await connectDB()
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('carbonsphere-session')
-    if (!sessionCookie) return null
+    const auth = await getServerAuth()
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
+    if (!session) return null
 
-    const user = await User.findById(sessionCookie.value)
+    // Look up the Mongoose User profile based on the authenticated email
+    const user = await User.findOne({ email: session.user.email })
     if (!user) return null
 
     return JSON.parse(JSON.stringify(user))

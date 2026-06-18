@@ -1,4 +1,3 @@
-import mongoose from 'mongoose'
 import { connectDB } from './mongoose'
 import {
   User,
@@ -54,7 +53,7 @@ export async function seedDatabase() {
   console.log('Starting database seeding...')
   try {
     await connectDB()
-  } catch (err) {
+  } catch {
     console.warn('MongoDB connection failed, seeding into local JSON DB fallback...')
   }
 
@@ -233,8 +232,8 @@ export async function seedDatabase() {
   console.log('Seeded simulation runs.')
 
   // 7. Seed achievements unlocked for user
-  const pioneerDef = createdAchievements.find((a: any) => a.badgeCode === 'FIRST_FOOTPRINT')
-  const strategistDef = createdAchievements.find((a: any) => a.badgeCode === 'PLAN_ADOPTED')
+  const pioneerDef = createdAchievements.find((a: { badgeCode: string }) => a.badgeCode === 'FIRST_FOOTPRINT')
+  const strategistDef = createdAchievements.find((a: { badgeCode: string }) => a.badgeCode === 'PLAN_ADOPTED')
   
   if (pioneerDef && strategistDef) {
     await UserAchievement.insertMany([

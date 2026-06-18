@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Leaf, ArrowRight, Sparkles, Compass, Shield, Flame } from 'lucide-react'
+import { ArrowRight, Sparkles, Compass, Shield } from 'lucide-react'
 import { loginDemoUser } from '@/server/actions/auth'
 
 export default function Home() {
@@ -22,7 +22,7 @@ export default function Home() {
       } else {
         setError(res.error || 'Failed to authenticate as demo user.')
       }
-    } catch (e) {
+    } catch {
       setError('An unexpected error occurred.')
     } finally {
       setLoading(false)
@@ -107,7 +107,7 @@ export default function Home() {
             </div>
             <h3 className="text-lg font-semibold text-white">Stateful Impact Simulator</h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Run custom "what-if" models. Visualize projected savings and commit actions directly to your dashboard timeline.
+              Run custom &ldquo;what-if&rdquo; models. Visualize projected savings and commit actions directly to your dashboard timeline.
             </p>
           </div>
         </div>

@@ -2,15 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { 
-  MessageSquare, 
   Send, 
-  Sparkles, 
   Plus, 
-  Flame, 
   Brain, 
-  TrendingDown, 
   User, 
-  ShieldAlert,
   Loader
 } from 'lucide-react'
 import { getConversations, createConversation, getConversationMessages } from '@/server/actions/coach'
@@ -37,21 +32,25 @@ export default function CoachPage() {
   const [tokenUsage, setTokenUsage] = useState({ prompt: 140, completion: 480, limit: 10000 })
   
   const scrollRef = useRef<HTMLDivElement>(null)
+  const completeTextRef = useRef('')
 
   // 1. Load conversations list on mount
-  const loadConversationsList = async (selectFirst = true) => {
+  const loadConversationsList = React.useCallback(async (selectFirst = true) => {
     setSidebarLoading(true)
     const list = await getConversations()
     setConversations(list)
     setSidebarLoading(false)
-    if (selectFirst && list.length > 0 && !activeId) {
-      setActiveId(list[0]._id)
+    if (selectFirst && list.length > 0) {
+      setActiveId(prev => prev || list[0]._id)
     }
-  }
+  }, [])
 
   useEffect(() => {
-    loadConversationsList()
-  }, [])
+    const timer = setTimeout(() => {
+      loadConversationsList()
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [loadConversationsList])
 
   // 2. Load messages when activeId changes
   useEffect(() => {
@@ -106,7 +105,7 @@ export default function CoachPage() {
 
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
-      let completeText = ''
+      completeTextRef.current = ''
 
       if (reader) {
         while (true) {
@@ -122,18 +121,18 @@ export default function CoachPage() {
             if (line.startsWith('0:')) {
               try {
                 const textVal = JSON.parse(line.substring(2))
-                completeText += textVal
+                completeTextRef.current += textVal
                 setMessages(prev => {
                   const updated = [...prev]
                   if (updated.length > 0) {
                     updated[updated.length - 1] = {
                       role: 'model',
-                      content: completeText
+                      content: completeTextRef.current
                     }
                   }
                   return updated
                 })
-              } catch (e) {
+              } catch {
                 // handle parsing edge-case fallback
               }
             }
@@ -145,10 +144,10 @@ export default function CoachPage() {
       setTokenUsage(prev => ({
         ...prev,
         prompt: prev.prompt + Math.round(textToSend.length / 4),
-        completion: prev.completion + Math.round(completeText.length / 4)
+        completion: prev.completion + Math.round(completeTextRef.current.length / 4)
       }))
 
-    } catch (e) {
+    } catch {
       setMessages(prev => [
         ...prev,
         { role: 'model', content: 'Sorry, I encountered an error connecting to my core brain. Please check your credentials.' }

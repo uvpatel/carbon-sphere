@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       const result = streamText({
         model: google('gemini-2.0-flash'),
         system: systemPrompt,
-        messages: messages.map((m: any) => ({ role: m.role, content: m.content })),
+        messages: messages.map((m: { role: "user" | "assistant" | "system" | "model"; content: string }) => ({ role: m.role, content: m.content })),
         async onFinish({ text, usage }) {
           // Log cost tracking in background
           try {
@@ -154,8 +154,9 @@ export async function POST(req: NextRequest) {
         }
       })
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error inside /api/chat:', err)
-    return new Response(JSON.stringify({ error: err.message || 'Internal Server Error' }), { status: 500 })
+    const error = err as Error
+    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), { status: 500 })
   }
 }

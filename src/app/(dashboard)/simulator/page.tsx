@@ -3,24 +3,27 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
-  TrendingDown, 
   Sparkles, 
-  Check, 
   Trees, 
-  Compass, 
-  Trophy, 
-  Leaf, 
   AlertCircle,
   Loader
 } from 'lucide-react'
 import { getSimulatorBaseline, saveSimulationRun } from '@/server/actions/simulator'
+
+interface Breakdown {
+  transportation: number
+  energy: number
+  diet: number
+  shopping: number
+  waste: number
+}
 
 interface Scenario {
   id: string
   name: string
   desc: string
   category: 'diet' | 'energy' | 'transportation' | 'waste'
-  calculateSavings: (breakdown: any) => number
+  calculateSavings: (breakdown: Breakdown) => number
 }
 
 const SCENARIOS: Scenario[] = [
@@ -68,12 +71,18 @@ const SCENARIOS: Scenario[] = [
   }
 ]
 
+interface BaselineData {
+  baselineCo2e: number
+  goalId: string | null
+  targetCo2e: number | null
+  breakdown: Breakdown
+}
+
 export default function SimulatorPage() {
   const router = useRouter()
-  const [baseline, setBaseline] = useState<any>(null)
+  const [baseline, setBaseline] = useState<BaselineData | null>(null)
   const [loading, setLoading] = useState(true)
   const [toggledIds, setToggledIds] = useState<string[]>([])
-  const [projected, setProjected] = useState(0)
   const [isSaving, setIsSaving] = useState(false)
   const [isAdopting, setIsAdopting] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
@@ -85,15 +94,14 @@ export default function SimulatorPage() {
     getSimulatorBaseline().then((res) => {
       if (res) {
         setBaseline(res)
-        setProjected(res.baselineCo2e)
       }
       setLoading(false)
     })
   }, [])
 
-  // 2. Re-calculate projections on scenario toggles
-  useEffect(() => {
-    if (!baseline) return
+  // 2. Re-calculate projections on scenario toggles (direct computation during render)
+  let projected = baseline ? baseline.baselineCo2e : 0
+  if (baseline) {
     let savings = 0
     toggledIds.forEach(id => {
       const scenario = SCENARIOS.find(s => s.id === id)
@@ -101,8 +109,8 @@ export default function SimulatorPage() {
         savings += scenario.calculateSavings(baseline.breakdown)
       }
     })
-    setProjected(Math.max(400, baseline.baselineCo2e - savings)) // emissions floor
-  }, [toggledIds, baseline])
+    projected = Math.max(400, baseline.baselineCo2e - savings)
+  }
 
   const handleToggle = (id: string) => {
     setToggledIds(prev => 
@@ -123,7 +131,7 @@ export default function SimulatorPage() {
       } else {
         setError(res.error || 'Failed to save scenario run.')
       }
-    } catch (e) {
+    } catch {
       setError('An unexpected error occurred.')
     } finally {
       setIsSaving(false)
@@ -154,7 +162,7 @@ export default function SimulatorPage() {
       } else {
         setError(data.error || 'Failed to adopt plan')
       }
-    } catch (e) {
+    } catch {
       setError('An unexpected error occurred.')
     } finally {
       setIsAdopting(false)
@@ -180,7 +188,7 @@ export default function SimulatorPage() {
         <div className="space-y-2 max-w-md">
           <h1 className="text-2xl md:text-3xl font-extrabold text-white">Simulator Locked</h1>
           <p className="text-muted-foreground text-sm font-light">
-            You must calculate your baseline footprint in the Calculator first before running "what-if" impact scenarios.
+            You must calculate your baseline footprint in the Calculator first before running &ldquo;what-if&rdquo; impact scenarios.
           </p>
         </div>
         <button
@@ -239,7 +247,7 @@ export default function SimulatorPage() {
         {/* Scenario Selectors */}
         <div className="glass-card p-6 md:p-8 rounded-2xl border border-border lg:col-span-2 space-y-6">
           <div>
-            <h3 className="text-lg font-bold text-white">"What-If" Scenarios</h3>
+            <h3 className="text-lg font-bold text-white">&ldquo;What-If&rdquo; Scenarios</h3>
             <p className="text-muted-foreground text-xs font-light">Toggle options to build your reduction strategy</p>
           </div>
 

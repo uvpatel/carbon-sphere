@@ -3,6 +3,8 @@ import path from 'path'
 
 const DB_FILE = path.join(process.cwd(), 'src/lib/db/db.json')
 
+export type DbDocument = Record<string, unknown>
+
 // Generate simple string IDs mimicking MongoDB's ObjectIds
 export function generateId(): string {
   return Math.random().toString(16).substring(2, 10) + 
@@ -10,7 +12,7 @@ export function generateId(): string {
          Math.random().toString(16).substring(2, 10)
 }
 
-function readData(): Record<string, any[]> {
+function readData(): Record<string, DbDocument[]> {
   try {
     if (!fs.existsSync(DB_FILE)) {
       const dir = path.dirname(DB_FILE)
@@ -28,7 +30,7 @@ function readData(): Record<string, any[]> {
   }
 }
 
-function writeData(data: Record<string, any[]>) {
+function writeData(data: Record<string, DbDocument[]>) {
   try {
     const dir = path.dirname(DB_FILE)
     if (!fs.existsSync(dir)) {
@@ -40,7 +42,7 @@ function writeData(data: Record<string, any[]>) {
   }
 }
 
-function matches(doc: any, query: any): boolean {
+function matches(doc: DbDocument, query: Record<string, unknown>): boolean {
   if (!query || Object.keys(query).length === 0) return true
   
   for (const key in query) {
@@ -48,17 +50,21 @@ function matches(doc: any, query: any): boolean {
     
     // Support regex query objects (like { $regex: '...' })
     if (queryVal && typeof queryVal === 'object' && '$regex' in queryVal) {
-      const regex = new RegExp(queryVal.$regex, queryVal.$options || '')
-      if (!regex.test(doc[key] || '')) return false
+      const regexVal = queryVal as { $regex: string; $options?: string }
+      const regex = new RegExp(regexVal.$regex, regexVal.$options || '')
+      const docVal = doc[key]
+      if (!regex.test(typeof docVal === 'string' ? docVal : '')) return false
       continue
     }
 
     // Support standard key matching
     let docVal = doc[key]
-    if (docVal && docVal._id) docVal = docVal._id // handle populated objects
+    if (docVal && typeof docVal === 'object' && '_id' in docVal) {
+      docVal = (docVal as { _id: unknown })._id
+    }
 
-    const docStr = docVal ? docVal.toString() : ''
-    const queryStr = queryVal ? queryVal.toString() : ''
+    const docStr = docVal !== undefined && docVal !== null ? String(docVal) : ''
+    const queryStr = queryVal !== undefined && queryVal !== null ? String(queryVal) : ''
     
     if (docStr !== queryStr) {
       return false
@@ -68,13 +74,13 @@ function matches(doc: any, query: any): boolean {
 }
 
 export const jsonDb = {
-  find(collectionName: string, query: any = {}) {
+  find(collectionName: string, query: Record<string, unknown> = {}) {
     const data = readData()
     const list = data[collectionName] || []
     return list.filter(item => matches(item, query))
   },
 
-  findOne(collectionName: string, query: any = {}) {
+  findOne(collectionName: string, query: Record<string, unknown> = {}) {
     const results = this.find(collectionName, query)
     return results[0] || null
   },
@@ -82,16 +88,16 @@ export const jsonDb = {
   findById(collectionName: string, id: string) {
     const data = readData()
     const list = data[collectionName] || []
-    return list.find(item => item._id === id || item._id?.toString() === id.toString()) || null
+    return list.find(item => item._id === id || String(item._id) === String(id)) || null
   },
 
-  create(collectionName: string, doc: any) {
+  create(collectionName: string, doc: DbDocument) {
     const data = readData()
     if (!data[collectionName]) {
       data[collectionName] = []
     }
     
-    const newDoc = {
+    const newDoc: DbDocument = {
       _id: doc._id || generateId(),
       createdAt: doc.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -103,7 +109,7 @@ export const jsonDb = {
     return newDoc
   },
 
-  insertMany(collectionName: string, docs: any[]) {
+  insertMany(collectionName: string, docs: DbDocument[]) {
     const data = readData()
     if (!data[collectionName]) {
       data[collectionName] = []
@@ -121,7 +127,7 @@ export const jsonDb = {
     return newDocs
   },
 
-  deleteMany(collectionName: string, query: any = {}) {
+  deleteMany(collectionName: string, query: Record<string, unknown> = {}) {
     const data = readData()
     const list = data[collectionName] || []
     const remaining = list.filter(item => !matches(item, query))
@@ -131,7 +137,7 @@ export const jsonDb = {
     return { deletedCount }
   },
 
-  updateOne(collectionName: string, query: any, update: any) {
+  updateOne(collectionName: string, query: Record<string, unknown>, update: Record<string, unknown>) {
     const data = readData()
     const list = data[collectionName] || []
     let updatedCount = 0
@@ -144,13 +150,15 @@ export const jsonDb = {
         
         // Support $set operator or plain object update
         if (update.$set) {
-          updatedItem = { ...updatedItem, ...update.$set }
+          updatedItem = { ...updatedItem, ...(update.$set as Record<string, unknown>) }
         } else if (update.$push) {
-          for (const key in update.$push) {
-            if (!Array.isArray(updatedItem[key])) {
+          const pushVal = update.$push as Record<string, unknown>
+          for (const key in pushVal) {
+            const arr = updatedItem[key]
+            if (!Array.isArray(arr)) {
               updatedItem[key] = []
             }
-            updatedItem[key].push(update.$push[key])
+            (updatedItem[key] as unknown[]).push(pushVal[key])
           }
         } else {
           updatedItem = { ...updatedItem, ...update }

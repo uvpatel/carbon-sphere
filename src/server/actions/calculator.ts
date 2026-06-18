@@ -24,7 +24,7 @@ export async function saveFootprint(input: FootprintInput) {
     }
 
     // Calculate emissions
-    const { totalCo2e, breakdown } = calculateFootprint(input)
+    const { totalCo2e } = calculateFootprint(input)
 
     // Save footprint document
     const footprint = new Footprint({
@@ -74,13 +74,14 @@ export async function saveFootprint(input: FootprintInput) {
     try {
       // Next.js 16 requires a second argument indicating cache profile lifecycle
       revalidateTag(`footprints-${userId}`, 'seconds')
-    } catch (e) {
+    } catch {
       // Fallback in case of environments where tags behave differently
     }
 
     return { success: true, totalCo2e, footprintId: footprint._id.toString() }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error saving footprint:', error)
-    return { success: false, error: error.message || 'Failed to save footprint calculation' }
+    const err = error as Error
+    return { success: false, error: err.message || 'Failed to save footprint calculation' }
   }
 }

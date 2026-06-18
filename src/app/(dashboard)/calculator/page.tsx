@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
   ChevronLeft, 
@@ -15,7 +15,7 @@ import {
   ShoppingBag,
   Trash2
 } from 'lucide-react'
-import { calculateFootprint, FootprintInput, FootprintCalculationResult } from '@/lib/calculations/engine'
+import { calculateFootprint, FootprintInput } from '@/lib/calculations/engine'
 import { saveFootprint } from '@/server/actions/calculator'
 
 const STEPS = [
@@ -46,16 +46,12 @@ export default function CalculatorPage() {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(0)
   const [formValues, setFormValues] = useState<FootprintInput>(DEFAULT_VALUES)
-  const [runningCalculation, setRunningCalculation] = useState<FootprintCalculationResult | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
-  // 1. Calculate running breakdown on changes
-  useEffect(() => {
-    const res = calculateFootprint(formValues)
-    setRunningCalculation(res)
-  }, [formValues])
+  // 1. Calculate running breakdown on changes (direct computation during render)
+  const runningCalculation = calculateFootprint(formValues)
 
   const handleFillDemo = () => {
     setFormValues(DEMO_VALUES)
@@ -88,7 +84,7 @@ export default function CalculatorPage() {
       } else {
         setError(res.error || 'Failed to save calculation')
       }
-    } catch (e) {
+    } catch {
       setError('An unexpected error occurred.')
     } finally {
       setIsSubmitting(false)
@@ -164,9 +160,9 @@ export default function CalculatorPage() {
                   <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Vehicle Engine Type</label>
                   <select
                     value={formValues.transportation.carType}
-                    onChange={(e: any) => setFormValues({
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormValues({
                       ...formValues,
-                      transportation: { ...formValues.transportation, carType: e.target.value }
+                      transportation: { ...formValues.transportation, carType: e.target.value as FootprintInput['transportation']['carType'] }
                     })}
                     className="w-full p-3 bg-muted border border-border rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
                   >
@@ -237,9 +233,9 @@ export default function CalculatorPage() {
                   <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Primary Heating Source</label>
                   <select
                     value={formValues.energy.heatingSource}
-                    onChange={(e: any) => setFormValues({
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormValues({
                       ...formValues,
-                      energy: { ...formValues.energy, heatingSource: e.target.value }
+                      energy: { ...formValues.energy, heatingSource: e.target.value as FootprintInput['energy']['heatingSource'] }
                     })}
                     className="w-full p-3 bg-muted border border-border rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500"
                   >
@@ -268,7 +264,7 @@ export default function CalculatorPage() {
                         type="button"
                         onClick={() => setFormValues({
                           ...formValues,
-                          diet: { type: item.value as any }
+                          diet: { type: item.value as FootprintInput['diet']['type'] }
                         })}
                         className={`p-4 rounded-xl border text-left cursor-pointer transition-all duration-200 ${
                           formValues.diet.type === item.value

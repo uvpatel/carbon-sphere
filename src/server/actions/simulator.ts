@@ -26,9 +26,10 @@ export async function saveSimulationRun(baselineCo2e: number, projectedCo2e: num
 
     revalidatePath('/dashboard')
     return { success: true, runId: run._id.toString() }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error saving simulation run:', error)
-    return { success: false, error: error.message }
+    const err = error as Error
+    return { success: false, error: err.message }
   }
 }
 

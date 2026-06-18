@@ -7,7 +7,6 @@ import {
   LayoutDashboard, 
   Calculator, 
   MessageSquare, 
-  Flame, 
   TrendingUp, 
   LogOut, 
   ChevronLeft, 

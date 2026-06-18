@@ -15,6 +15,7 @@ import {
   AuditEvent 
 } from '@/lib/db/models'
 import { connectDB } from '@/lib/db/mongoose'
+import { jsonDb } from '@/lib/db/jsonDb'
 
 export async function getSettingsData() {
   try {
@@ -53,7 +54,6 @@ export async function updateUserSettings(theme: string, unitSystem: string) {
     
     // Support local JSON DB update
     if (typeof user.save !== 'function' || !mongoose?.connection || mongoose.connection.readyState !== 1) {
-      const { jsonDb } = require('@/lib/db/jsonDb')
       jsonDb.updateOne('User', { _id: userId }, user)
     } else {
       await user.save()
@@ -62,9 +62,10 @@ export async function updateUserSettings(theme: string, unitSystem: string) {
     revalidatePath('/dashboard')
     revalidatePath('/settings')
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating settings:', error)
-    return { success: false, error: error.message }
+    const err = error as Error
+    return { success: false, error: err.message }
   }
 }
 
@@ -94,7 +95,6 @@ export async function updateNotificationPrefs(
 
     // Support local JSON DB update
     if (typeof user.save !== 'function' || !mongoose?.connection || mongoose.connection.readyState !== 1) {
-      const { jsonDb } = require('@/lib/db/jsonDb')
       jsonDb.updateOne('User', { _id: userId }, user)
     } else {
       await user.save()
@@ -102,9 +102,10 @@ export async function updateNotificationPrefs(
 
     revalidatePath('/settings')
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating notification prefs:', error)
-    return { success: false, error: error.message }
+    const err = error as Error
+    return { success: false, error: err.message }
   }
 }
 
@@ -154,9 +155,10 @@ export async function exportUserData() {
     await audit.save()
 
     return { success: true, payload: JSON.stringify(dataPackage, null, 2) }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error exporting user data:', error)
-    return { success: false, error: error.message }
+    const err = error as Error
+    return { success: false, error: err.message }
   }
 }
 
@@ -176,7 +178,6 @@ export async function requestAccountDeletion() {
     user.deletedAt = new Date()
     
     if (typeof user.save !== 'function' || !mongoose?.connection || mongoose.connection.readyState !== 1) {
-      const { jsonDb } = require('@/lib/db/jsonDb')
       jsonDb.updateOne('User', { _id: userId }, user)
     } else {
       await user.save()
@@ -194,10 +195,9 @@ export async function requestAccountDeletion() {
     cookieStore.delete('carbonsphere-session')
 
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting account:', error)
-    return { success: false, error: error.message }
+    const err = error as Error
+    return { success: false, error: err.message }
   }
 }
-
-

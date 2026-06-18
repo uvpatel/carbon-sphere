@@ -3,19 +3,24 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Leaf, ArrowRight, User, Mail } from 'lucide-react'
+import { Leaf, ArrowRight, User, Mail, Lock } from 'lucide-react'
 import { registerUser } from '@/server/actions/auth'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 export default function RegisterPage() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name || !email) {
+    if (!name || !email || !password) {
       setError('Please fill in all fields.')
       return
     }
@@ -23,14 +28,14 @@ export default function RegisterPage() {
     setLoading(true)
     setError('')
     try {
-      const res = await registerUser(name, email)
+      const res = await registerUser(name, email, password)
       if (res.success) {
         router.push('/dashboard')
         router.refresh()
       } else {
         setError(res.error || 'Registration failed')
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred.')
     } finally {
       setLoading(false)
@@ -47,65 +52,93 @@ export default function RegisterPage() {
           <Link href="/" className="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400">
             <Leaf size={24} />
           </Link>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Create your account</h1>
-          <p className="text-muted-foreground text-sm">
+          <h1 className="text-2xl font-bold tracking-tight text-white animate-fade-in">Create your account</h1>
+          <p className="text-muted-foreground text-sm font-light">
             Join CarbonSphere and begin your green journey
           </p>
         </div>
 
         {/* Card */}
-        <div className="glass-card p-8 rounded-2xl border border-border space-y-6">
-          <form onSubmit={handleRegister} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="name" className="text-xs font-semibold tracking-wider uppercase text-muted-foreground">
-                Your Name
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-3 flex items-center text-muted-foreground">
-                  <User size={16} />
-                </span>
-                <input
-                  id="name"
-                  type="text"
-                  placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted border border-border text-white placeholder-muted-foreground focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-sm transition-all duration-200"
-                  required
-                />
+        <Card className="glass-card border border-border">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-xl font-bold text-white">Register</CardTitle>
+            <CardDescription className="text-muted-foreground text-xs font-light">
+              Enter details below to create an account
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <form onSubmit={handleRegister} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-xs font-semibold tracking-wider uppercase text-muted-foreground">
+                  Your Name
+                </Label>
+                <div className="relative flex items-center">
+                  <span className="absolute left-3 text-muted-foreground z-10">
+                    <User size={16} />
+                  </span>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="pl-10 h-10 w-full rounded-xl bg-muted border border-border text-white placeholder-muted-foreground focus-visible:border-emerald-500 focus-visible:ring-emerald-500 transition-all duration-200"
+                    required
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-xs font-semibold tracking-wider uppercase text-muted-foreground">
-                Email Address
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-3 flex items-center text-muted-foreground">
-                  <Mail size={16} />
-                </span>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted border border-border text-white placeholder-muted-foreground focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-sm transition-all duration-200"
-                  required
-                />
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-xs font-semibold tracking-wider uppercase text-muted-foreground">
+                  Email Address
+                </Label>
+                <div className="relative flex items-center">
+                  <span className="absolute left-3 text-muted-foreground z-10">
+                    <Mail size={16} />
+                  </span>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10 h-10 w-full rounded-xl bg-muted border border-border text-white placeholder-muted-foreground focus-visible:border-emerald-500 focus-visible:ring-emerald-500 transition-all duration-200"
+                    required
+                  />
+                </div>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-sm cursor-pointer disabled:opacity-50 active:scale-98 transition-all duration-200"
-            >
-              {loading ? 'Creating Account...' : 'Register Account'}
-              <ArrowRight size={16} />
-            </button>
-          </form>
-        </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-xs font-semibold tracking-wider uppercase text-muted-foreground">
+                  Password
+                </Label>
+                <div className="relative flex items-center">
+                  <span className="absolute left-3 text-muted-foreground z-10">
+                    <Lock size={16} />
+                  </span>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10 h-10 w-full rounded-xl bg-muted border border-border text-white placeholder-muted-foreground focus-visible:border-emerald-500 focus-visible:ring-emerald-500 transition-all duration-200"
+                    required
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-sm disabled:opacity-50 active:scale-98 transition-all duration-200"
+              >
+                {loading ? 'Creating Account...' : 'Register Account'}
+                <ArrowRight size={16} />
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
 
         {error && (
           <p className="text-sm text-center text-destructive font-medium border border-destructive/20 bg-destructive/10 px-4 py-2.5 rounded-lg max-w-xs mx-auto animate-shake">

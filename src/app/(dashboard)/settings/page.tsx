@@ -10,7 +10,6 @@ import {
   Check, 
   Bell, 
   Monitor, 
-  ShieldAlert,
   Loader
 } from 'lucide-react'
 import { 
@@ -67,7 +66,7 @@ export default function SettingsPage() {
       } else {
         setError(res.error || 'Failed to update preferences')
       }
-    } catch (e) {
+    } catch {
       setError('An unexpected error occurred.')
     } finally {
       setSavingPrefs(false)
@@ -90,7 +89,7 @@ export default function SettingsPage() {
       } else {
         setError(res.error || 'Failed to update notification preferences')
       }
-    } catch (e) {
+    } catch {
       setError('An unexpected error occurred.')
     } finally {
       setSavingNotifications(false)
@@ -116,7 +115,7 @@ export default function SettingsPage() {
       } else {
         setError(res.error || 'Failed to compile data export.')
       }
-    } catch (e) {
+    } catch {
       setError('An unexpected error occurred.')
     } finally {
       setExporting(false)
@@ -138,7 +137,7 @@ export default function SettingsPage() {
       } else {
         setError(res.error || 'Failed to delete account.')
       }
-    } catch (e) {
+    } catch {
       setError('An unexpected error occurred.')
     } finally {
       setDeleting(false)

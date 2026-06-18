@@ -4,27 +4,31 @@ import {
   Flame, 
   Trophy, 
   Leaf, 
-  Calendar, 
   TrendingDown, 
   Trees, 
   Car, 
   Plus, 
   Award,
   ArrowRight,
-  TrendingUp,
-  Settings,
-  Bell
+  TrendingUp
 } from 'lucide-react'
 import { connectDB } from '@/lib/db/mongoose'
 import { Footprint, CarbonGoal, UserAchievement, ActivityLog } from '@/lib/db/models'
 import { getCurrentUser } from '@/server/actions/auth'
 import { DashboardCharts } from '@/components/DashboardCharts'
+import { 
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription
+} from '@/components/ui/card'
 
 async function calculateStreak(userId: string): Promise<number> {
   const logs = await ActivityLog.find({ userId, eventType: 'LOGIN' }).sort({ createdAt: -1 })
   if (!logs || logs.length === 0) return 0
   const uniqueDays = new Set(
-    logs.map((log: any) => new Date(log.createdAt).toDateString())
+    logs.map((log: { createdAt: Date | string }) => new Date(log.createdAt).toDateString())
   )
   
   let streak = 0
@@ -52,6 +56,8 @@ async function calculateStreak(userId: string): Promise<number> {
   }
   return streak
 }
+
+
 
 export default async function DashboardPage() {
   await connectDB()
@@ -123,7 +129,7 @@ export default async function DashboardPage() {
   const treesPlanted = Math.max(0, Math.round(annualSavings / 22))
   const carKmSaved = Math.max(0, Math.round(annualSavings / 0.18))
   // Prepare Chart Data
-  const chartsHistory = footprints.map((f: any) => ({
+  const chartsHistory = footprints.map((f: { createdAt: Date | string; totalCo2e: number }) => ({
     date: f.createdAt.toString(),
     total: f.totalCo2e
   }))
@@ -159,14 +165,14 @@ export default async function DashboardPage() {
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Footprint Card */}
-        <div className="glass-card p-6 rounded-2xl border border-border flex flex-col justify-between space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Current Footprint</span>
+        <Card className="glass-card border border-border flex flex-col justify-between">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Current Footprint</CardTitle>
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400">
               <Leaf size={16} />
             </div>
-          </div>
-          <div>
+          </CardHeader>
+          <CardContent className="pb-6">
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-white">{(latestFootprint.totalCo2e / 1000).toFixed(2)}</span>
               <span className="text-sm font-medium text-muted-foreground">tons CO2e / yr</span>
@@ -178,52 +184,54 @@ export default async function DashboardPage() {
                 <span className="text-muted-foreground font-light">vs baseline</span>
               </div>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Goal Progress Card */}
-        <div className="glass-card p-6 rounded-2xl border border-border flex flex-col justify-between space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Reduction Goal</span>
+        <Card className="glass-card border border-border flex flex-col justify-between">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Reduction Goal</CardTitle>
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400">
               <Trophy size={16} />
             </div>
-          </div>
-          {activeGoal ? (
-            <div className="space-y-2">
-              <div className="flex justify-between items-baseline text-sm">
-                <span className="text-white font-bold">{goalProgress}% Target Hit</span>
-                <span className="text-muted-foreground text-xs font-light">Target: {(activeGoal.targetCo2e / 1000).toFixed(2)}t</span>
+          </CardHeader>
+          <CardContent className="pb-6">
+            {activeGoal ? (
+              <div className="space-y-2">
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-white font-bold">{goalProgress}% Target Hit</span>
+                  <span className="text-muted-foreground text-xs font-light">Target: {(activeGoal.targetCo2e / 1000).toFixed(2)}t</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+                  <div 
+                    className="h-full bg-emerald-500 rounded-full transition-all duration-500" 
+                    style={{ width: `${goalProgress}%` }}
+                  />
+                </div>
+                <p className="text-[10px] text-muted-foreground font-light">
+                  Deadline: {new Date(activeGoal.deadline).toLocaleDateString()}
+                </p>
               </div>
-              <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
-                <div 
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-500" 
-                  style={{ width: `${goalProgress}%` }}
-                />
+            ) : (
+              <div>
+                <p className="text-xs text-muted-foreground font-light mb-2">No active carbon goal set.</p>
+                <Link href="/simulator" className="text-emerald-400 hover:text-emerald-300 text-xs font-semibold flex items-center gap-1">
+                  Configure Goal in Simulator <ArrowRight size={12} />
+                </Link>
               </div>
-              <p className="text-[10px] text-muted-foreground font-light">
-                Deadline: {new Date(activeGoal.deadline).toLocaleDateString()}
-              </p>
-            </div>
-          ) : (
-            <div>
-              <p className="text-xs text-muted-foreground font-light mb-2">No active carbon goal set.</p>
-              <Link href="/simulator" className="text-emerald-400 hover:text-emerald-300 text-xs font-semibold flex items-center gap-1">
-                Configure Goal in Simulator <ArrowRight size={12} />
-              </Link>
-            </div>
-          )}
-        </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Streak Card */}
-        <div className="glass-card p-6 rounded-2xl border border-border flex flex-col justify-between space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Activity Streak</span>
+        <Card className="glass-card border border-border flex flex-col justify-between">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Activity Streak</CardTitle>
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400">
               <Flame size={16} className={streakDays > 0 ? 'animate-pulse' : ''} />
             </div>
-          </div>
-          <div>
+          </CardHeader>
+          <CardContent className="pb-6">
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-white">{streakDays}</span>
               <span className="text-sm font-medium text-muted-foreground">days streak</span>
@@ -231,8 +239,8 @@ export default async function DashboardPage() {
             <p className="text-xs text-muted-foreground font-light mt-2">
               {streakDays > 0 ? 'Keep logging activities to grow your streak!' : 'Log in tomorrow to start your streak.'}
             </p>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Visual Analytics */}
@@ -241,73 +249,75 @@ export default async function DashboardPage() {
       {/* Grid of Achievements and Equivalencies */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Equivalencies (Span 2) */}
-        <div className="glass-card p-6 rounded-2xl border border-border lg:col-span-2 space-y-6">
-          <div>
-            <h3 className="text-lg font-bold text-white">Your Ecological Offsets</h3>
-            <p className="text-muted-foreground text-xs font-light">What your carbon reductions mean in physical equivalents</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/30 border border-border/50">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
-                <Trees size={24} />
+        <Card className="glass-card border border-border lg:col-span-2 flex flex-col justify-between">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-white">Your Ecological Offsets</CardTitle>
+            <CardDescription className="text-muted-foreground text-xs font-light">What your carbon reductions mean in physical equivalents</CardDescription>
+          </CardHeader>
+          <CardContent className="pb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/30 border border-border/50">
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
+                  <Trees size={24} />
+                </div>
+                <div className="space-y-1">
+                  <span className="text-2xl font-bold text-white">{treesPlanted}</span>
+                  <h4 className="text-sm font-medium text-foreground">Mature Trees Offset</h4>
+                  <p className="text-xs text-muted-foreground font-light leading-relaxed">
+                    Equivalent to the annual carbon dioxide absorbing power of {treesPlanted} mature forests.
+                  </p>
+                </div>
               </div>
-              <div className="space-y-1">
-                <span className="text-2xl font-bold text-white">{treesPlanted}</span>
-                <h4 className="text-sm font-medium text-foreground">Mature Trees Offset</h4>
-                <p className="text-xs text-muted-foreground font-light leading-relaxed">
-                  Equivalent to the annual carbon dioxide absorbing power of {treesPlanted} mature forests.
-                </p>
+
+              <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/30 border border-border/50">
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
+                  <Car size={24} />
+                </div>
+                <div className="space-y-1">
+                  <span className="text-2xl font-bold text-white">{carKmSaved.toLocaleString()}</span>
+                  <h4 className="text-sm font-medium text-foreground">Car Kilometers Avoided</h4>
+                  <p className="text-xs text-muted-foreground font-light leading-relaxed">
+                    Equivalent to avoiding driving {carKmSaved.toLocaleString()} km in a standard gasoline vehicle.
+                  </p>
+                </div>
               </div>
             </div>
-
-            <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/30 border border-border/50">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
-                <Car size={24} />
-              </div>
-              <div className="space-y-1">
-                <span className="text-2xl font-bold text-white">{carKmSaved.toLocaleString()}</span>
-                <h4 className="text-sm font-medium text-foreground">Car Kilometers Avoided</h4>
-                <p className="text-xs text-muted-foreground font-light leading-relaxed">
-                  Equivalent to avoiding driving {carKmSaved.toLocaleString()} km in a standard gasoline vehicle.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Unlocked Badges */}
-        <div className="glass-card p-6 rounded-2xl border border-border flex flex-col space-y-6">
-          <div>
-            <h3 className="text-lg font-bold text-white">Unlocked Badges</h3>
-            <p className="text-muted-foreground text-xs font-light">Badges earned through eco activities</p>
-          </div>
-
-          <div className="flex-1 overflow-y-auto max-h-[160px] space-y-3 pr-1">
-            {userAchievements && userAchievements.length > 0 ? (
-              userAchievements.map((item: any, idx: number) => {
-                const def = item.achievementId
-                if (!def) return null
-                return (
-                  <div key={idx} className="flex items-center gap-3 p-2 rounded-xl bg-muted/20 border border-border/30 hover:border-emerald-500/10 transition-colors">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 shrink-0">
-                      <Award size={18} />
+        <Card className="glass-card border border-border flex flex-col justify-between">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-white">Unlocked Badges</CardTitle>
+            <CardDescription className="text-muted-foreground text-xs font-light">Badges earned through eco activities</CardDescription>
+          </CardHeader>
+          <CardContent className="pb-6 flex-1 flex flex-col justify-center min-h-[160px]">
+            <div className="overflow-y-auto max-h-[160px] space-y-3 pr-1 w-full">
+              {userAchievements && userAchievements.length > 0 ? (
+                userAchievements.map((item: { achievementId?: { name: string; description: string } }, idx: number) => {
+                  const def = item.achievementId
+                  if (!def) return null
+                  return (
+                    <div key={idx} className="flex items-center gap-3 p-2 rounded-xl bg-muted/20 border border-border/30 hover:border-emerald-500/10 transition-colors">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 shrink-0">
+                        <Award size={18} />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-xs font-semibold text-white truncate">{def.name}</h4>
+                        <p className="text-[10px] text-muted-foreground truncate leading-none">{def.description}</p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <h4 className="text-xs font-semibold text-white truncate">{def.name}</h4>
-                      <p className="text-[10px] text-muted-foreground truncate leading-none">{def.description}</p>
-                    </div>
-                  </div>
-                )
-              })
-            ) : (
-              <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
-                <Award size={24} className="opacity-30 mb-2" />
-                <span className="text-xs font-light">Log footprints and plans to earn badges!</span>
-              </div>
-            )}
-          </div>
-        </div>
+                  )
+                })
+              ) : (
+                <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground w-full">
+                  <Award size={24} className="opacity-30 mb-2" />
+                  <span className="text-xs font-light">Log footprints and plans to earn badges!</span>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
